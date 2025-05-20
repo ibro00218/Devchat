@@ -1,0 +1,238 @@
+Build me a developer-focused chat application with a clean, dark UI inspired by VS Code and platforms like Discord. The UI should include a sidebar for friends and group (party) chats, and the main chat window must support code sharing with perfect formatting and syntax highlighting.
+
+Core Requirements:
+Dark UI Design:
+
+Minimal and elegant layout
+
+Left sidebar: Friends, Groups, “New Party” button
+
+Right chat window: Messages, user names, timestamps
+
+Code Snippet Support:
+
+Support unlimited characters in code blocks
+
+Perfect alignment, indentation, and color syntax
+
+Code should be displayed using syntax highlighting (use Prism.js, Highlight.js, Monaco, or CodeMirror)
+
+Preserve tabs, spaces, and newlines exactly as written
+
+Copy Code Feature:
+
+Add a “Copy” button on every code block
+
+Clicking should copy the entire snippet to clipboard
+
+Show tooltip “Copied!” after click
+
+Multi-Language Syntax Support:
+
+Detect or manually select code language
+
+Support at least: JavaScript, Python, C/C++, Java, HTML, CSS, SQL, JSON, TypeScript, Shell, etc.
+
+Code Editor Input:
+
+Allow users to write and send code in an expandable editor input
+
+Use textarea or Monaco/CodeMirror for writing
+
+Resizable input box with scroll
+
+Advanced Features (Optional but Desired):
+Real-time chat using Socket.io or Firebase
+
+Message reactions and thread replies
+
+Snippet bookmarking and tagging
+
+Code preview for HTML/CSS/JS (sandboxed)
+
+GitHub/GitLab integration for commits, PRs, issues
+
+Syntax theme selector (Dracula, Monokai, Night Owl, etc.)
+
+Export snippet as .txt or shareable link
+
+Snippet expiration (auto delete)
+
+Voice/video calling with screen sharing for code
+
+
+
+🌐 Platform Independence
+Works on Windows, Mac, Linux — and even on mobile.
+
+Everything runs in browser (with optional backend for execution).
+
+Great for global teams with mixed devices.
+
+🧑‍💻 Developer-Friendly Experience
+Directly write, edit & run code without leaving the chat app.
+
+Makes it a one-stop platform — like Discord + VS Code.
+
+Useful for hackathons, code review sessions, mentorship, etc.
+
+. 🛠️ Real-Time Collaboration
+Users can share code, run snippets, and debug together.
+
+Pair programming, live Q&A, and quick prototyping become super easy.
+
+Helps remote dev teams or student groups work faster.
+
+
+
+Role & Permission System — Owner Controlled
+👑 Group Owner Capabilities:
+Action	Description
+➕ Create roles	Define role name & permissions
+✏️ Edit roles	Change permissions at any time
+🗑️ Delete roles	Remove roles completely
+👥 Assign roles to members	Pick who gets what
+🔄 Revoke or change roles	Anytime
+✅ Grant admin-level powers	Like moderation, user bans, etc.
+
+Role UI Example (Create/Edit Role)
+UI fields:
+
+🔤 Role Name: [ UI Designer ]
+
+🎨 Role Color: [ Color Picker ]
+
+🎯 Role Icon: [ Emoji Selector ]
+
+📝 Description: [ Optional ]
+
+✅ Permission toggles
+
+
+
+
+
+
+
+👑 Group Creator Role Control
+────────────────────────────
+
+🧑‍💼 Group Owner (creator):
+
+Full rights:
+
+Add/remove members
+
+Assign roles (Admin, Member, Guest)
+
+Create/delete channels
+
+Kick/ban users
+
+Rename group or transfer ownership
+
+
+
+Bonus Features
+✅ Sound alert
+✅ Push notification (desktop/mobile)
+✅ “Mentions Only” mode
+✅ Mute group from sending notifs
+✅ Group by day (“Today”, “Yesterday”, etc.)
+✅ Archive important notifications
+
+
+
+
+Someone sends them a DM
+
+They're mentioned in a group chat (@username)
+
+They've been added to a group or role
+
+A friend request is accepted or pending
+
+A file or code snippet was shared with them
+
+
+✅ 1. Functional Overview:
+📥 Your “Inbox” will have two parts:
+
+Section	Description
+🔔 Notifications	Realtime alerts for mentions, invites, requests, files
+💬 Messages Inbox	Recent DMs + unread message count
+
+
+
+
+
+
+ Save/Import Themes
+────────────────────────────
+
+✅ Let users export/import themes
+✅ Offer pre-made templates like:
+
+“Midnight Dev”
+
+“Paper UI”
+
+“Retro Terminal”
+
+“Material Ocean”
+
+
+
+
+The user can control:
+
+🎨 UI Appearance:
+Background color (chat, sidebar, header)
+
+Text colors (normal, hover, active)
+
+Accent colors (buttons, mentions, code borders)
+
+Border radius, spacing, shadows
+
+Fonts (e.g., Inter, Fira Code, JetBrains Mono)
+
+
+
+
+💻 Code Syntax Highlighting:
+Choose colors for:
+
+Keywords (e.g., function, if, for)
+
+Strings ("hello world")
+
+Variables (myVar)
+
+Comments (// note)
+
+Numbers, Booleans, etc.
+
+🌗 Base Mode:
+Start from Dark, Light, or AMOLED
+
+Then customize all parts manually
+
+
+
+Bonus Features
+✅ “Save as Custom Theme”
+
+🖼️ Upload background image or set gradient
+
+⬇️ Export/Import theme files
+
+🧑‍🤝‍🧑 Share theme with others
+
+📁 Organize multiple themes per user
+
+🌍 Publish themes to public “Theme Gallery”
+
+yes — It’s 100% Possible
+You can give users full creative control to build their own themes. This adds serious personalization and makes your app feel premium and dev-centric.
+
