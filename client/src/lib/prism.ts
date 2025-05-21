@@ -1,31 +1,5 @@
-import Prism from "prismjs";
-
-// This simpler approach works better with Vite's bundling
-import "prismjs/components/prism-markup";
-import "prismjs/components/prism-javascript";
-import "prismjs/components/prism-typescript";
-import "prismjs/components/prism-jsx";
-import "prismjs/components/prism-tsx";
-import "prismjs/components/prism-css";
-import "prismjs/components/prism-python";
-import "prismjs/components/prism-java";
-import "prismjs/components/prism-c";
-import "prismjs/components/prism-cpp";
-import "prismjs/components/prism-csharp";
-import "prismjs/components/prism-go";
-import "prismjs/components/prism-ruby";
-import "prismjs/components/prism-rust";
-import "prismjs/components/prism-json";
-import "prismjs/components/prism-bash";
-import "prismjs/components/prism-yaml";
-import "prismjs/components/prism-sql";
-import "prismjs/components/prism-php";
-import "prismjs/components/prism-markdown";
-
-// Initialize Prism for client-side usage
-if (typeof window !== "undefined") {
-  window.Prism = window.Prism || Prism;
-}
+// Simple utility for code highlighting without external dependencies
+// This file replaces the Prism dependency
 
 // Language aliases mapping
 const langMap: Record<string, string> = {
@@ -53,6 +27,7 @@ const escapeHtml = (code: string): string => {
     .replace(/'/g, '&#039;');
 };
 
+// Basic syntax highlighting with regex
 export const highlightCode = (code: string, language = "typescript"): string => {
   if (!code) return "";
   
@@ -60,21 +35,82 @@ export const highlightCode = (code: string, language = "typescript"): string => 
   const cleanLang = language.toLowerCase().trim();
   
   // Get the correct language identifier
-  const prismLang = langMap[cleanLang] || cleanLang;
+  const lang = langMap[cleanLang] || cleanLang;
   
-  // Check if the language is supported
-  if (!Prism.languages[prismLang]) {
-    console.warn(`Language "${prismLang}" not available in Prism, defaulting to plain text`);
-    return `<pre class="language-none">${escapeHtml(code)}</pre>`;
+  // Common programming elements
+  const patterns: { [key: string]: { regex: RegExp; className: string }[] } = {
+    // Common for most languages
+    common: [
+      // Comments
+      { regex: /(\/\/.*$)/gm, className: 'comment' },
+      { regex: /(\/\*[\s\S]*?\*\/)/gm, className: 'comment' },
+      { regex: /(#.*$)/gm, className: 'comment' },
+      
+      // Strings
+      { regex: /("(?:\\.|[^"\\])*")/g, className: 'string' },
+      { regex: /('(?:\\.|[^'\\])*')/g, className: 'string' },
+      { regex: /(`(?:\\.|[^`\\])*`)/g, className: 'string' },
+      
+      // Numbers
+      { regex: /\b(\d+(?:\.\d+)?)\b/g, className: 'number' },
+      
+      // Keywords (common)
+      { regex: /\b(function|return|if|else|for|while|class|try|catch|new|this)\b/g, className: 'keyword' },
+      
+      // Function calls
+      { regex: /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, className: 'function' },
+    ],
+    
+    // JavaScript/TypeScript specific
+    javascript: [
+      { regex: /\b(const|let|var|async|await|import|export|from)\b/g, className: 'keyword' },
+      { regex: /\b(true|false|null|undefined)\b/g, className: 'keyword' },
+    ],
+    typescript: [
+      { regex: /\b(const|let|var|async|await|import|export|from|interface|type|enum)\b/g, className: 'keyword' },
+      { regex: /\b(true|false|null|undefined)\b/g, className: 'keyword' },
+    ],
+    
+    // Python specific
+    python: [
+      { regex: /\b(def|import|from|as|class|with|is|in|not|and|or|True|False|None)\b/g, className: 'keyword' },
+      { regex: /\b(print|len|range|str|int|float|list|dict|tuple|set)\b/g, className: 'function' },
+    ],
+  };
+
+  const applicablePatterns = [...(patterns.common || [])];
+  
+  // Add language-specific patterns if they exist
+  if (patterns[lang]) {
+    applicablePatterns.push(...patterns[lang]);
   }
 
-  // Highlight the code with the appropriate language
   try {
-    return Prism.highlight(code, Prism.languages[prismLang], prismLang);
+    // Apply each pattern
+    let highlighted = escapeHtml(code);
+    applicablePatterns.forEach(({ regex, className }) => {
+      highlighted = highlighted.replace(regex, match => `<span class="${className}">${match}</span>`);
+    });
+    
+    // Add CSS classes for syntax highlighting
+    const style = document.createElement('style');
+    if (!document.getElementById('syntax-highlighting-styles')) {
+      style.id = 'syntax-highlighting-styles';
+      style.textContent = `
+        .comment { color: #6a9955; }
+        .string { color: #ce9178; }
+        .number { color: #b5cea8; }
+        .keyword { color: #569cd6; }
+        .function { color: #dcdcaa; }
+        pre { line-height: 1.5; }
+        code { font-family: "Consolas", monospace; }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    return highlighted;
   } catch (error) {
-    console.error(`Error highlighting code for language "${prismLang}"`, error);
+    console.error("Failed to highlight code:", error);
     return escapeHtml(code);
   }
 };
-
-export default Prism;
