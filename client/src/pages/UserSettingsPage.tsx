@@ -263,13 +263,7 @@ export default function UserSettingsPage() {
               <div className="grid grid-cols-3 gap-3 mb-4">
                 <div 
                   className={`bg-[#1e1f22] p-3 rounded cursor-pointer ${currentTheme === 'dark' ? 'border-2 border-[#5865f2]' : 'border border-[#3b3d43]'}`}
-                  onClick={() => {
-                    setCurrentTheme('dark');
-                    // In a real app, would apply dark theme to the application
-                    document.documentElement.classList.add('dark');
-                    document.documentElement.classList.remove('light');
-                    console.log('Dark theme applied');
-                  }}
+                  onClick={() => applyTheme('dark')}
                 >
                   <p className="font-medium">Dark</p>
                   <p className="text-xs text-zinc-400">Default dark theme</p>
@@ -277,13 +271,7 @@ export default function UserSettingsPage() {
                 
                 <div 
                   className={`bg-[#ffffff] p-3 rounded text-black cursor-pointer ${currentTheme === 'light' ? 'border-2 border-[#5865f2]' : 'border border-[#3b3d43]'}`}
-                  onClick={() => {
-                    setCurrentTheme('light');
-                    // In a real app, would apply light theme to the application
-                    document.documentElement.classList.add('light');
-                    document.documentElement.classList.remove('dark');
-                    console.log('Light theme applied');
-                  }}
+                  onClick={() => applyTheme('light')}
                 >
                   <p className="font-medium">Light</p>
                   <p className="text-xs text-zinc-600">Light theme</p>
@@ -291,14 +279,7 @@ export default function UserSettingsPage() {
                 
                 <div 
                   className={`bg-[#313338] p-3 rounded cursor-pointer ${currentTheme === 'dim' ? 'border-2 border-[#5865f2]' : 'border border-[#3b3d43]'}`}
-                  onClick={() => {
-                    setCurrentTheme('dim');
-                    // In a real app, would apply dim theme to the application
-                    document.documentElement.classList.add('dim');
-                    document.documentElement.classList.remove('light');
-                    document.documentElement.classList.remove('dark');
-                    console.log('Dim theme applied');
-                  }}
+                  onClick={() => applyTheme('dim')}
                 >
                   <p className="font-medium">Dim</p>
                   <p className="text-xs text-zinc-400">Softer dark theme</p>
@@ -478,8 +459,47 @@ export default function UserSettingsPage() {
     }
   };
 
+  // Apply theme function
+  const applyTheme = (theme: string) => {
+    setCurrentTheme(theme);
+    
+    // Remove all theme classes first
+    document.body.classList.remove('theme-dark', 'theme-light', 'theme-dim');
+    
+    // Add the selected theme class
+    document.body.classList.add(`theme-${theme}`);
+    
+    // Apply CSS variables based on theme
+    if (theme === 'dark') {
+      document.documentElement.style.setProperty('--bg-primary', '#1E1E1E');
+      document.documentElement.style.setProperty('--bg-secondary', '#2b2d31');
+      document.documentElement.style.setProperty('--text-primary', '#FFFFFF');
+    } else if (theme === 'light') {
+      document.documentElement.style.setProperty('--bg-primary', '#FFFFFF');
+      document.documentElement.style.setProperty('--bg-secondary', '#F2F3F5');
+      document.documentElement.style.setProperty('--text-primary', '#000000');
+    } else if (theme === 'dim') {
+      document.documentElement.style.setProperty('--bg-primary', '#313338');
+      document.documentElement.style.setProperty('--bg-secondary', '#2b2d31');
+      document.documentElement.style.setProperty('--text-primary', '#FFFFFF');
+    }
+    
+    console.log(`${theme} theme applied successfully`);
+  };
+
   return (
-    <div className="flex h-screen bg-[#313338] text-white">
+    <div className="flex h-screen bg-[#313338] text-white relative">
+      {/* Close button to return to home */}
+      <button 
+        className="absolute top-4 right-4 z-50 bg-[#4752c4] hover:bg-[#5865f2] text-white rounded-full p-2"
+        onClick={() => navigate('/')}
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+      
       {/* Sidebar */}
       <div className="w-60 bg-[#2b2d31] p-3 flex flex-col">
         <div className="flex-1 space-y-1">
