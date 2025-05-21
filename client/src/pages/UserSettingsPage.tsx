@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { 
@@ -23,9 +22,9 @@ import {
   Activity
 } from 'lucide-react';
 
-export default function Settings() {
-  const [activeTab, setActiveTab] = useState('my-account');
+export default function UserSettingsPage() {
   const [, navigate] = useLocation();
+  const [activeSection, setActiveSection] = useState('my-account');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
@@ -67,120 +66,12 @@ export default function Settings() {
     }, 1000);
   };
 
-  return (
-    <div className="flex h-screen bg-[#313338] text-white">
-      {/* Sidebar */}
-      <div className="w-60 bg-[#2b2d31] p-3 flex flex-col">
-        <div className="flex-1 space-y-1">
-          <div className="flex flex-col w-full bg-transparent h-auto space-y-1">
-            <h2 className="text-xs text-zinc-400 font-semibold mb-1 px-2.5">USER SETTINGS</h2>
-            
-            <TabsTrigger
-              value="my-account"
-              onClick={() => setActiveTab('my-account')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'my-account' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <User className="h-4 w-4" />
-              My Account
-            </TabsTrigger>
-            
-            <TabsTrigger
-              value="profile"
-              onClick={() => setActiveTab('profile')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'profile' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <User className="h-4 w-4" />
-              Profile
-            </TabsTrigger>
-            
-            <TabsTrigger
-              value="notifications"
-              onClick={() => setActiveTab('notifications')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'notifications' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <Bell className="h-4 w-4" />
-              Notifications
-            </TabsTrigger>
-
-            <Separator className="my-2 bg-[#3b3d43]" />
-            <h2 className="text-xs text-zinc-400 font-semibold mb-1 px-2.5">APP SETTINGS</h2>
-            
-            <TabsTrigger
-              value="appearance"
-              onClick={() => setActiveTab('appearance')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'appearance' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <Palette className="h-4 w-4" />
-              Appearance
-            </TabsTrigger>
-            
-            <TabsTrigger
-              value="accessibility"
-              onClick={() => setActiveTab('accessibility')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'accessibility' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <HelpCircle className="h-4 w-4" />
-              Accessibility
-            </TabsTrigger>
-            
-            <TabsTrigger
-              value="language"
-              onClick={() => setActiveTab('language')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'language' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <Languages className="h-4 w-4" />
-              Language
-            </TabsTrigger>
-            
-            <Separator className="my-2 bg-[#3b3d43]" />
-            <h2 className="text-xs text-zinc-400 font-semibold mb-1 px-2.5">CODE SETTINGS</h2>
-            
-            <TabsTrigger
-              value="code-preferences"
-              onClick={() => setActiveTab('code-preferences')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'code-preferences' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <Code className="h-4 w-4" />
-              Code Preferences
-            </TabsTrigger>
-            
-            <TabsTrigger
-              value="activity-status"
-              onClick={() => setActiveTab('activity-status')}
-              className={`w-full justify-start gap-2 px-2.5 py-1.5 h-auto text-sm ${
-                activeTab === 'activity-status' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
-              }`}
-            >
-              <Activity className="h-4 w-4" />
-              Activity Status
-            </TabsTrigger>
-          </TabsList>
-        </div>
-        
-        <Button variant="destructive" className="w-full mt-4" onClick={() => navigate('/')}>
-          <LogOut className="h-4 w-4 mr-2" />
-          Log Out
-        </Button>
-      </div>
-      
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto p-6">
-        <Tabs value={activeTab} className="w-full">
-          <TabsContent value="my-account" className="mt-0">
+  // Render different content based on active section
+  const renderContent = () => {
+    switch(activeSection) {
+      case 'my-account':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">My Account</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -244,9 +135,12 @@ export default function Settings() {
                 Delete Account
               </Button>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="profile" className="mt-0">
+          </>
+        );
+        
+      case 'profile':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Profile</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -291,9 +185,12 @@ export default function Settings() {
                 </Button>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="notifications" className="mt-0">
+          </>
+        );
+        
+      case 'notifications':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Notifications</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -339,9 +236,12 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="appearance" className="mt-0">
+          </>
+        );
+        
+      case 'appearance':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Appearance</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -379,9 +279,12 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="accessibility" className="mt-0">
+          </>
+        );
+        
+      case 'accessibility':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Accessibility</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -407,9 +310,12 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="language" className="mt-0">
+          </>
+        );
+        
+      case 'language':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Language</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -424,9 +330,12 @@ export default function Settings() {
                 <option value="zh-CN">中文 (简体)</option>
               </select>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="code-preferences" className="mt-0">
+          </>
+        );
+        
+      case 'code-preferences':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Code Preferences</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -482,9 +391,12 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-          
-          <TabsContent value="activity-status" className="mt-0">
+          </>
+        );
+        
+      case 'activity-status':
+        return (
+          <>
             <h1 className="text-2xl font-bold mb-4">Activity Status</h1>
             
             <div className="bg-[#2b2d31] rounded-lg p-4 mb-6">
@@ -510,8 +422,119 @@ export default function Settings() {
                 </div>
               </div>
             </div>
-          </TabsContent>
-        </Tabs>
+          </>
+        );
+        
+      default:
+        return <div>Select a setting from the sidebar</div>;
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-[#313338] text-white">
+      {/* Sidebar */}
+      <div className="w-60 bg-[#2b2d31] p-3 flex flex-col">
+        <div className="flex-1 space-y-1">
+          <div className="flex flex-col w-full bg-transparent h-auto space-y-1">
+            <h2 className="text-xs text-zinc-400 font-semibold mb-1 px-2.5">USER SETTINGS</h2>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'my-account' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('my-account')}
+            >
+              <User className="h-4 w-4" />
+              My Account
+            </button>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'profile' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('profile')}
+            >
+              <User className="h-4 w-4" />
+              Profile
+            </button>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'notifications' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('notifications')}
+            >
+              <Bell className="h-4 w-4" />
+              Notifications
+            </button>
+
+            <Separator className="my-2 bg-[#3b3d43]" />
+            <h2 className="text-xs text-zinc-400 font-semibold mb-1 px-2.5">APP SETTINGS</h2>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'appearance' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('appearance')}
+            >
+              <Palette className="h-4 w-4" />
+              Appearance
+            </button>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'accessibility' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('accessibility')}
+            >
+              <HelpCircle className="h-4 w-4" />
+              Accessibility
+            </button>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'language' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('language')}
+            >
+              <Languages className="h-4 w-4" />
+              Language
+            </button>
+            
+            <Separator className="my-2 bg-[#3b3d43]" />
+            <h2 className="text-xs text-zinc-400 font-semibold mb-1 px-2.5">CODE SETTINGS</h2>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'code-preferences' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('code-preferences')}
+            >
+              <Code className="h-4 w-4" />
+              Code Preferences
+            </button>
+            
+            <button
+              className={`w-full justify-start flex gap-2 px-2.5 py-1.5 h-auto text-sm rounded-md ${
+                activeSection === 'activity-status' ? 'bg-[#3b3d43] text-white' : 'bg-transparent text-zinc-400 hover:bg-[#35373c] hover:text-zinc-200'
+              }`}
+              onClick={() => setActiveSection('activity-status')}
+            >
+              <Activity className="h-4 w-4" />
+              Activity Status
+            </button>
+          </div>
+        </div>
+        
+        <Button variant="destructive" className="w-full mt-4" onClick={() => navigate('/')}>
+          <LogOut className="h-4 w-4 mr-2" />
+          Log Out
+        </Button>
+      </div>
+      
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto p-6">
+        {renderContent()}
       </div>
     </div>
   );

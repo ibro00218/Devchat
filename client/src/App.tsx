@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/not-found";
 import ChatApp from "@/pages/ChatApp";
 import LoginPage from "@/pages/Login";
-import Settings from "@/pages/Settings";
+import UserSettingsPage from "@/pages/UserSettingsPage";
 
 function Router() {
   // For demo purposes, let's assume the user is authenticated
@@ -15,7 +15,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/login" component={LoginPage} />
-      <Route path="/settings" component={Settings} />
+      <Route path="/settings" component={UserSettingsPage} />
       <Route path="/" component={isAuthenticated ? ChatApp : LoginPage} />
       <Route component={NotFound} />
     </Switch>
