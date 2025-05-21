@@ -78,20 +78,44 @@ export function CallProvider({ children, currentUser }: CallProviderProps) {
       clearTimeout(mockIncomingCallTimeoutRef.current);
     }
     
-    // Set a random timeout between 20-40 seconds for next mock incoming call
-    const timeout = Math.floor(Math.random() * 20000) + 20000;
+    // Set a random timeout between 60-120 seconds for next mock incoming call
+    // Longer period to be less intrusive during testing
+    const timeout = Math.floor(Math.random() * 60000) + 60000;
     mockIncomingCallTimeoutRef.current = setTimeout(() => {
       // Only trigger if not in a call
       if (callStatus === 'idle') {
-        const mockCaller: User = {
-          id: 500,
-          username: 'codesage',
-          tagNumber: '0042',
-          status: 'online',
-          avatarInitial: 'C',
-          avatarColor: '#4CAF50',
-          joinedAt: new Date()
-        };
+        const mockCallers = [
+          {
+            id: 500,
+            username: 'CodeSage',
+            tagNumber: '0042',
+            status: 'online' as 'online',
+            avatarInitial: 'C',
+            avatarColor: '#4CAF50',
+            joinedAt: new Date()
+          },
+          {
+            id: 501,
+            username: 'DevNinja',
+            tagNumber: '1337',
+            status: 'online' as 'online',
+            avatarInitial: 'D',
+            avatarColor: '#E91E63',
+            joinedAt: new Date()
+          },
+          {
+            id: 502,
+            username: 'WebWizard',
+            tagNumber: '2468',
+            status: 'online' as 'online',
+            avatarInitial: 'W',
+            avatarColor: '#2196F3',
+            joinedAt: new Date()
+          }
+        ];
+        
+        // Select a random caller
+        const mockCaller = mockCallers[Math.floor(Math.random() * mockCallers.length)];
         
         // 50% chance of video or audio call
         const callType: CallType = Math.random() > 0.5 ? 'video' : 'audio';
@@ -101,12 +125,25 @@ export function CallProvider({ children, currentUser }: CallProviderProps) {
           type: callType
         });
         
-        // Auto reject after 15 seconds if not answered
+        // Toast notification
+        toast({
+          title: `Incoming ${callType} call`,
+          description: `${mockCaller.username} is calling you`,
+          duration: 10000
+        });
+        
+        // Auto reject after 20 seconds if not answered
         setTimeout(() => {
           if (incomingCall && callStatus === 'idle') {
             setIncomingCall(null);
+            toast({
+              title: 'Missed call',
+              description: `You missed a call from ${mockCaller.username}`,
+              variant: "destructive",
+              duration: 5000
+            });
           }
-        }, 15000);
+        }, 20000);
       }
       
       // Setup next mock call
@@ -252,17 +289,30 @@ export function CallProvider({ children, currentUser }: CallProviderProps) {
   // Toggle screen share
   const toggleScreenShare = () => {
     if (currentCall) {
-      setIsScreenSharing(!isScreenSharing);
+      // First update the state to reflect the new screen sharing status
+      const newStatus = !isScreenSharing;
+      setIsScreenSharing(newStatus);
+      
+      // Then update the call object with the new status
       setCurrentCall({
         ...currentCall,
-        isScreenSharing: !isScreenSharing
+        isScreenSharing: newStatus
       });
       
+      // Provide meaningful feedback to the user
       toast({
-        title: isScreenSharing ? 'Screen sharing stopped' : 'Screen sharing started',
-        description: isScreenSharing 
-          ? 'You stopped sharing your screen' 
-          : 'Others can now see your screen',
+        title: newStatus ? 'Screen sharing started' : 'Screen sharing stopped',
+        description: newStatus 
+          ? 'Others can now see your screen' 
+          : 'You stopped sharing your screen',
+        variant: newStatus ? "default" : "destructive"
+      });
+    } else {
+      // Inform user they need an active call to share screen
+      toast({
+        title: 'No active call',
+        description: 'You need to be in a call to share your screen',
+        variant: "destructive"
       });
     }
   };
