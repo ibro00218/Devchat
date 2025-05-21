@@ -84,6 +84,7 @@ export function Sidebar({
                 variant="ghost" 
                 size="icon" 
                 className="h-8 w-8 rounded-full bg-[#252525] hover:bg-[#333333]"
+                onClick={() => window.location.href = '/settings'}
               >
                 <span className="material-icons text-sm text-[#A0A0A0]">settings</span>
               </Button>
@@ -304,64 +305,81 @@ export function Sidebar({
       
       {/* User Profile Section */}
       <div className="p-3 border-t border-[#333333] bg-[#171717] flex items-center justify-between">
-        <div className="flex items-center">
-          <UserAvatar user={friends[0]} size="sm" />
-          <div className="ml-2">
-            <div className="text-[#E1E1E1] text-sm font-medium">{friends[0].username}</div>
-            <div className="text-[#A0A0A0] text-xs flex items-center">
-              <div className="h-2 w-2 rounded-full bg-green-500 mr-1"></div>
-              Online
+        <div className="flex-1">
+          {/* Import UserSettingsButton from our components */}
+          <div className="flex items-center justify-between" onClick={() => window.location.href = '/settings'}>
+            <div className="flex items-center">
+              <UserAvatar user={friends[0]} size="sm" />
+              <div className="ml-2">
+                <div className="text-[#E1E1E1] text-sm font-medium">{friends[0].username}</div>
+                <div className="text-[#A0A0A0] text-xs flex items-center">
+                  <div className="h-2 w-2 rounded-full bg-green-500 mr-1"></div>
+                  Online
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex space-x-1">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 rounded-full bg-[#252525] hover:bg-[#333333]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Mic toggled');
+                      }}
+                    >
+                      <span className="material-icons text-sm text-[#A0A0A0]">mic</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p className="text-xs">Mute</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 rounded-full bg-[#252525] hover:bg-[#333333]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        console.log('Headset toggled');
+                      }}
+                    >
+                      <span className="material-icons text-sm text-[#A0A0A0]">headset</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p className="text-xs">Headset</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-8 w-8 p-0 rounded-full bg-[#252525] hover:bg-[#333333]"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        window.location.href = '/settings';
+                      }}
+                    >
+                      <span className="material-icons text-sm text-[#A0A0A0]">settings</span>
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top">
+                    <p className="text-xs">User Settings</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </div>
           </div>
-        </div>
-        
-        <div className="flex space-x-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 p-0 rounded-full bg-[#252525] hover:bg-[#333333]"
-                >
-                  <span className="material-icons text-sm text-[#A0A0A0]">mic</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <p className="text-xs">Mute</p>
-              </TooltipContent>
-            </Tooltip>
-            
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 p-0 rounded-full bg-[#252525] hover:bg-[#333333]"
-                >
-                  <span className="material-icons text-sm text-[#A0A0A0]">headset</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <p className="text-xs">Headset</p>
-              </TooltipContent>
-            </Tooltip>
-            
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="h-8 w-8 p-0 rounded-full bg-[#252525] hover:bg-[#333333]"
-                >
-                  <span className="material-icons text-sm text-[#A0A0A0]">settings</span>
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">
-                <p className="text-xs">User Settings</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
         </div>
       </div>
       
