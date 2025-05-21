@@ -8,9 +8,12 @@ export type CallStatus = 'idle' | 'calling' | 'connected' | 'ended';
 
 interface CallSession {
   id: string;
+  initiatorId: number;
   type: CallType;
   participants: User[];
   isScreenSharing: boolean;
+  startTime: Date;
+  isActive: boolean;
 }
 
 interface CallContextType {
@@ -125,9 +128,12 @@ export function CallProvider({ children, currentUser }: CallProviderProps) {
     const callId = generateCallId();
     setCurrentCall({
       id: callId,
+      initiatorId: currentUser.id,
       type,
       participants: recipients,
-      isScreenSharing: false
+      isScreenSharing: false,
+      startTime: new Date(),
+      isActive: true
     });
     setCallStatus('calling');
     
@@ -173,9 +179,12 @@ export function CallProvider({ children, currentUser }: CallProviderProps) {
     const callId = generateCallId();
     setCurrentCall({
       id: callId,
+      initiatorId: incomingCall.caller.id,
       type: incomingCall.type,
       participants: [incomingCall.caller],
-      isScreenSharing: false
+      isScreenSharing: false,
+      startTime: new Date(),
+      isActive: true
     });
     
     setCallStatus('connected');

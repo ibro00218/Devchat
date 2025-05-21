@@ -1,5 +1,6 @@
-import { cn } from "@/lib/utils";
-import { User, UserStatus } from "@/types/chat";
+import React from 'react';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { User } from '@/types/chat';
 
 interface UserAvatarProps {
   user: User;
@@ -12,44 +13,40 @@ export function UserAvatar({
   user, 
   showStatus = true, 
   size = "md", 
-  className 
+  className = ""
 }: UserAvatarProps) {
-  // Map size to dimensions
-  const sizeMap = {
-    sm: "w-6 h-6 text-xs",
-    md: "w-8 h-8 text-sm",
-    lg: "w-10 h-10 text-base"
+  const getSizeClass = () => {
+    switch (size) {
+      case "sm": return "h-8 w-8";
+      case "lg": return "h-16 w-16";
+      case "md":
+      default: return "h-10 w-10";
+    }
   };
-
-  // Map status to colors and classes
-  const statusMap: Record<UserStatus, { bg: string, animation?: string }> = {
-    online: { bg: "bg-[#10B981]", animation: "status-online" },
-    away: { bg: "bg-[#F59E0B]" },
-    offline: { bg: "bg-[#9CA3AF]" }
+  
+  const getStatusColor = () => {
+    switch (user.status) {
+      case "online": return "bg-green-500";
+      case "away": return "bg-amber-500";
+      case "offline": return "bg-gray-500";
+      default: return "bg-gray-500";
+    }
   };
-
-  const statusClasses = statusMap[user.status];
-
+  
   return (
-    <div className={cn("relative", className)}>
-      <div 
-        className={cn(
-          "rounded-full flex items-center justify-center text-white font-medium", 
-          sizeMap[size],
-          user.avatarColor
-        )}
-      >
-        {user.avatarInitial}
-      </div>
+    <div className={`relative ${className}`}>
+      <Avatar className={`${getSizeClass()} border-2 border-[#2A2A2A]`}>
+        <AvatarFallback 
+          style={{ backgroundColor: user.avatarColor }} 
+          className="text-white font-semibold"
+        >
+          {user.avatarInitial}
+        </AvatarFallback>
+      </Avatar>
       
       {showStatus && (
         <div 
-          className={cn(
-            "absolute bottom-0 right-0 rounded-full border-2 border-[#1A1A1A]",
-            statusClasses.bg,
-            statusClasses.animation,
-            size === "sm" ? "w-2 h-2" : "w-3 h-3"
-          )}
+          className={`absolute bottom-0 right-0 w-3 h-3 ${getStatusColor()} rounded-full border-2 border-[#1A1A1A]`}
         />
       )}
     </div>

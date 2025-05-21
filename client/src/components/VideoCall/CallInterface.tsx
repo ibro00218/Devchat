@@ -6,7 +6,11 @@ import { CallStatus, useCall } from './CallProvider';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, MonitorUp, MonitorDown } from 'lucide-react';
 
 interface CallInterfaceProps {
-  callSession: CallSession;
+  callSession: {
+    id: string;
+    type: CallType;
+    isScreenSharing: boolean;
+  };
   currentUser: User;
   participants: User[];
   onEndCall: () => void;
@@ -166,7 +170,6 @@ export function CallInterface({
               <>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <Avatar className="h-20 w-20">
-                    <AvatarImage src={participant.avatarUrl} alt={participant.username} />
                     <AvatarFallback className={`text-white text-xl ${participantColors[index % participantColors.length]}`}>
                       {participant.avatarInitial}
                     </AvatarFallback>
