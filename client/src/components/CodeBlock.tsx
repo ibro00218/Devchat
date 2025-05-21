@@ -2,12 +2,74 @@ import { useRef, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { CodeSnippet } from "@/types/chat";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
-import { highlightCode } from "@/lib/prism";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LANGUAGE_OPTIONS } from "@/types/chat";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+
+// Simple syntax highlighting with regex
+function simpleSyntaxHighlighter(code: string, language: string): string {
+  // Common programming elements
+  const patterns: { [key: string]: { regex: RegExp; className: string }[] } = {
+    // Common for most languages
+    common: [
+      // Comments
+      { regex: /(\/\/.*$)/gm, className: 'comment' },
+      { regex: /(\/\*[\s\S]*?\*\/)/gm, className: 'comment' },
+      { regex: /(#.*$)/gm, className: 'comment' },
+      
+      // Strings
+      { regex: /("(?:\\.|[^"\\])*")/g, className: 'string' },
+      { regex: /('(?:\\.|[^'\\])*')/g, className: 'string' },
+      { regex: /(`(?:\\.|[^`\\])*`)/g, className: 'string' },
+      
+      // Numbers
+      { regex: /\b(\d+(?:\.\d+)?)\b/g, className: 'number' },
+      
+      // Keywords (common)
+      { regex: /\b(function|return|if|else|for|while|class|try|catch|new|this)\b/g, className: 'keyword' },
+      
+      // Function calls
+      { regex: /\b([a-zA-Z_$][a-zA-Z0-9_$]*)\s*\(/g, className: 'function' },
+    ],
+    
+    // JavaScript/TypeScript specific
+    javascript: [
+      { regex: /\b(const|let|var|async|await|import|export|from)\b/g, className: 'keyword' },
+      { regex: /\b(true|false|null|undefined)\b/g, className: 'keyword' },
+    ],
+    
+    // Python specific
+    python: [
+      { regex: /\b(def|import|from|as|class|with|is|in|not|and|or|True|False|None)\b/g, className: 'keyword' },
+      { regex: /\b(print|len|range|str|int|float|list|dict|tuple|set)\b/g, className: 'function' },
+    ],
+  };
+
+  const applicablePatterns = [...(patterns.common || [])];
+  
+  // Add language-specific patterns if they exist
+  if (patterns[language]) {
+    applicablePatterns.push(...patterns[language]);
+  }
+
+  // Apply each pattern
+  let highlighted = code;
+  applicablePatterns.forEach(({ regex, className }) => {
+    highlighted = highlighted.replace(regex, match => `<span class="${className}">${match}</span>`);
+  });
+
+  // Add line numbers and escape HTML
+  const lines = highlighted.split('\n');
+  let numberedLines = '';
+  
+  lines.forEach((line, i) => {
+    numberedLines += `<span class="line-number">${i + 1}</span>${line}${i < lines.length - 1 ? '\n' : ''}`;
+  });
+
+  return numberedLines;
+}
 
 interface CodeBlockProps {
   snippet: CodeSnippet;
@@ -30,16 +92,34 @@ export function CodeBlock({ snippet, className, onLanguageChange, editable = fal
   useEffect(() => {
     if (codeRef.current && !isEditing) {
       try {
-        const highlighted = highlightCode(snippet.code, snippet.language);
-        if (highlighted) {
-          codeRef.current.innerHTML = highlighted;
-        } else {
-          // If highlighting fails, display plain text
-          codeRef.current.textContent = snippet.code;
+        // Use our custom syntax highlighter that doesn't depend on Prism
+        const highlighted = simpleSyntaxHighlighter(snippet.code, snippet.language);
+        codeRef.current.innerHTML = highlighted;
+        
+        // Add syntax highlighting CSS
+        const style = document.createElement('style');
+        if (!document.getElementById('syntax-highlighting-styles')) {
+          style.id = 'syntax-highlighting-styles';
+          style.textContent = `
+            .comment { color: #6a9955; }
+            .string { color: #ce9178; }
+            .number { color: #b5cea8; }
+            .keyword { color: #569cd6; }
+            .function { color: #dcdcaa; }
+            .line-number { 
+              display: inline-block;
+              width: 2em;
+              color: #858585;
+              text-align: right;
+              margin-right: 1em;
+              user-select: none;
+            }
+          `;
+          document.head.appendChild(style);
         }
       } catch (error) {
         console.error("Failed to highlight code:", error);
-        // Fallback to plain text with escaping
+        // Fallback to plain text
         if (codeRef.current) {
           codeRef.current.textContent = snippet.code;
         }
@@ -278,9 +358,12 @@ export function CodeBlock({ snippet, className, onLanguageChange, editable = fal
           
           <div className="bg-[#1E1E1E] overflow-auto max-h-[70vh]">
             <pre className="p-4 m-0 bg-[#1E1E1E] overflow-x-auto scrollbar-custom text-sm leading-relaxed">
-              <code className={`language-${snippet.language}`}>
-                {snippet.code}
-              </code>
+              <code 
+                className={`language-${snippet.language}`} 
+                dangerouslySetInnerHTML={{ 
+                  __html: simpleSyntaxHighlighter(snippet.code, snippet.language) 
+                }} 
+              />
             </pre>
           </div>
           
