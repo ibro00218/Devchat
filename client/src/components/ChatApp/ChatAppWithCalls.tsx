@@ -77,7 +77,8 @@ export default function ChatAppWithCalls() {
     const recipient = users.find(user => user.id === currentChat.id);
     if (!recipient) return;
     
-    initiateCall([recipient], 'audio');
+    // Use the updated startCall interface
+    initiateCall('audio');
   };
 
   const handleStartVideoCall = () => {
@@ -86,7 +87,8 @@ export default function ChatAppWithCalls() {
     const recipient = users.find(user => user.id === currentChat.id);
     if (!recipient) return;
     
-    initiateCall([recipient], 'video');
+    // Use the updated startCall interface
+    initiateCall('video');
   };
 
   const handleStartScreenShare = () => {
