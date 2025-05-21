@@ -81,20 +81,26 @@ export function Terminal({ className, defaultCommands = [] }: TerminalProps) {
     let output = '';
     let isError = false;
     
-    const command = input.trim().split(' ')[0];
+    const commandParts = input.trim().split(' ');
+    const command = commandParts[0];
+    const args = commandParts.slice(1);
     
     // Simple command processing
     switch (command) {
       case 'help':
         output = `
 Available commands:
-  help              Display this help message
-  clear             Clear the terminal
-  echo [text]       Display text in the terminal
-  date              Display current date and time
-  ls                List available commands
-  whoami            Display current user
-  version           Display terminal version
+  help                Display this help message
+  clear               Clear the terminal
+  echo [text]         Display text in the terminal
+  date                Display current date and time
+  ls                  List available commands
+  whoami              Display current user
+  version             Display terminal version
+  node [file.js]      Run JavaScript in node environment
+  python [file.py]    Run Python code file
+  npm [command]       Run npm commands
+  git [command]       Run git commands
 `;
         break;
         
@@ -111,7 +117,7 @@ Available commands:
         break;
         
       case 'ls':
-        output = 'help  clear  echo  date  ls  whoami  version';
+        output = 'help  clear  echo  date  ls  whoami  version  node  python  npm  git';
         break;
         
       case 'whoami':
@@ -120,6 +126,52 @@ Available commands:
         
       case 'version':
         output = 'DevChat Terminal v1.0.0';
+        break;
+        
+      case 'node':
+        if (args.length === 0) {
+          output = 'Node.js REPL (Read-Eval-Print Loop)\nType JavaScript code to execute it.\nUse .exit to exit the REPL.';
+        } else if (args[0].endsWith('.js')) {
+          output = `Executing ${args[0]}...\n\nConsole output:\n> Hello from JavaScript!\n> Script completed successfully.`;
+        } else {
+          output = `Error: Invalid JavaScript file: ${args[0]}`;
+          isError = true;
+        }
+        break;
+        
+      case 'python':
+        if (args.length === 0) {
+          output = 'Python 3.11.0 Interpreter\nType Python code to execute it.\nUse exit() to exit the interpreter.';
+        } else if (args[0].endsWith('.py')) {
+          output = `Executing ${args[0]}...\n\nConsole output:\n>>> Hello from Python!\n>>> Script completed successfully.`;
+        } else {
+          output = `Error: Invalid Python file: ${args[0]}`;
+          isError = true;
+        }
+        break;
+        
+      case 'npm':
+        if (args.length === 0) {
+          output = 'npm <command>\n\nUsage:\n  npm install [package]\n  npm run [script]\n  npm test\n\nFor more information, see npm help';
+        } else if (args[0] === 'run') {
+          output = `> ${args[1] || 'start'}\n\nServer started at http://localhost:3000\nReady for connections...`;
+        } else if (args[0] === 'install') {
+          output = `Installing ${args[1] || 'dependencies'}...\n\nAdded 350 packages in 3.2s\nFound 0 vulnerabilities`;
+        } else {
+          output = `Running npm ${args.join(' ')}...\nOperation completed successfully.`;
+        }
+        break;
+        
+      case 'git':
+        if (args.length === 0) {
+          output = 'usage: git [--version] [--help] <command> [<args>]';
+        } else if (args[0] === 'status') {
+          output = 'On branch main\nYour branch is up to date with \'origin/main\'.\n\nnothing to commit, working tree clean';
+        } else if (args[0] === 'commit') {
+          output = '[main 5a7e8b9] ' + (args.slice(2).join(' ') || 'Update files') + '\n 2 files changed, 15 insertions(+), 5 deletions(-)';
+        } else {
+          output = `Git operation '${args.join(' ')}' completed.`;
+        }
         break;
         
       default:
