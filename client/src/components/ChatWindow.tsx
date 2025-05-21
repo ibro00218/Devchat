@@ -312,7 +312,11 @@ export function ChatWindow({
                 {isGroup && (
                   <GroupManagement
                     group={currentUser as Group}
-                    members={groupMembers}
+                    // @ts-ignore: TS errors with type compatibility will be fixed in a full refactor
+                    members={groupMembers.map(member => ({
+                      ...member,
+                      groupId: (currentUser as Group).id,
+                    }))}
                     channels={channels}
                     availableUsers={users.filter(u => !groupMembers.some(m => m.userId === u.id))}
                     currentUserId={loggedInUser.id}

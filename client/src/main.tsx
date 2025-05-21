@@ -1,6 +1,10 @@
 import { createRoot } from "react-dom/client";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "./lib/queryClient";
+import { StrictMode } from "react";
 import App from "./App";
 import "./index.css";
+import { Toaster } from "@/components/ui/toaster";
 
 // Import Prism CSS themes
 import "prismjs/themes/prism-tomorrow.css";
@@ -26,5 +30,13 @@ import "prismjs/components/prism-php";
 import "prismjs/components/prism-ruby";
 import "prismjs/components/prism-markup";
 import "prismjs/components/prism-markdown";
+import "prismjs/components/prism-yaml";
 
-createRoot(document.getElementById("root")!).render(<App />);
+createRoot(document.getElementById("root")!).render(
+  <StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <App />
+      <Toaster />
+    </QueryClientProvider>
+  </StrictMode>
+);
