@@ -25,7 +25,7 @@ import {
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState('my-account');
-  const [, navigate] = useLocation();
+  const [, setLocation] = useLocation();
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
   
@@ -63,7 +63,7 @@ export default function Settings() {
     console.log('Saving user settings');
     // Show success message
     setTimeout(() => {
-      navigate('/');
+      setLocation('/');
     }, 1000);
   };
 
@@ -168,10 +168,10 @@ export default function Settings() {
               <Activity className="h-4 w-4" />
               Activity Status
             </TabsTrigger>
-          </TabsList>
+          </div>
         </div>
         
-        <Button variant="destructive" className="w-full mt-4" onClick={() => navigate('/')}>
+        <Button variant="destructive" className="w-full mt-4" onClick={() => setLocation('/')}>
           <LogOut className="h-4 w-4 mr-2" />
           Log Out
         </Button>
