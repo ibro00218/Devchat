@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Phone, Video, MonitorUp } from 'lucide-react';
 import { CallDialog } from './CallDialog';
-import { User } from '@shared/schema';
+import { User } from '@/types/chat';
 
 interface CallButtonsProps {
   recipient: User;

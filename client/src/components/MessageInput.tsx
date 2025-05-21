@@ -216,6 +216,7 @@ export function MessageInput({
                   <button 
                     className="p-1.5 rounded text-[#A0A0A0] hover:bg-[#333333] hover:text-[#E1E1E1]"
                     onClick={onVoiceCall}
+                    aria-label="Start voice call"
                   >
                     <span className="material-icons text-sm">call</span>
                   </button>
@@ -230,6 +231,7 @@ export function MessageInput({
                   <button 
                     className="p-1.5 rounded text-[#A0A0A0] hover:bg-[#333333] hover:text-[#E1E1E1]"
                     onClick={onVideoCall}
+                    aria-label="Start video call"
                   >
                     <span className="material-icons text-sm">videocam</span>
                   </button>
@@ -244,6 +246,7 @@ export function MessageInput({
                   <button 
                     className="p-1.5 rounded text-[#A0A0A0] hover:bg-[#333333] hover:text-[#E1E1E1]"
                     onClick={onScreenShare}
+                    aria-label="Share screen"
                   >
                     <span className="material-icons text-sm">screen_share</span>
                   </button>

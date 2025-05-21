@@ -1,420 +1,301 @@
 import React, { createContext, useContext, useEffect, useState, useRef } from 'react';
 import { User } from '@/types/chat';
+import { toast } from '@/hooks/use-toast';
 
 // Define call session types
 export type CallType = 'audio' | 'video';
 export type CallStatus = 'idle' | 'calling' | 'connected' | 'ended';
 
-// Interface for call participants
-export interface CallParticipant {
-  user: User;
-  stream?: MediaStream;
-  audio: boolean;
-  video: boolean;
-  screen: boolean;
+interface CallSession {
+  id: string;
+  type: CallType;
+  participants: User[];
+  isScreenSharing: boolean;
 }
 
-// Interface for call context
 interface CallContextType {
   callStatus: CallStatus;
-  callType: CallType | null;
-  participants: CallParticipant[];
-  localStream: MediaStream | null;
-  screenStream: MediaStream | null;
-  isAudioEnabled: boolean;
-  isVideoEnabled: boolean;
-  isScreenSharing: boolean;
-  activeParticipant: CallParticipant | null;
-  initiateCall: (users: User[], type: CallType) => void;
-  joinCall: (callId: string) => void;
+  currentCall: CallSession | null;
+  incomingCall: { caller: User; type: CallType } | null;
+  initiateCall: (recipients: User[], type: CallType) => void;
+  acceptCall: () => void;
+  rejectCall: () => void;
   endCall: () => void;
-  toggleAudio: () => void;
+  toggleMute: () => void;
   toggleVideo: () => void;
   toggleScreenShare: () => void;
-  setActiveParticipant: (participant: CallParticipant) => void;
+  isMuted: boolean;
+  isVideoEnabled: boolean;
+  isScreenSharing: boolean;
 }
 
-// Create context with default values
-const CallContext = createContext<CallContextType>({
-  callStatus: 'idle',
-  callType: null,
-  participants: [],
-  localStream: null,
-  screenStream: null,
-  isAudioEnabled: true,
-  isVideoEnabled: true,
-  isScreenSharing: false,
-  activeParticipant: null,
-  initiateCall: () => {},
-  joinCall: () => {},
-  endCall: () => {},
-  toggleAudio: () => {},
-  toggleVideo: () => {},
-  toggleScreenShare: () => {},
-  setActiveParticipant: () => {},
-});
+const CallContext = createContext<CallContextType | undefined>(undefined);
 
-// Mock socket for demonstration
-const createMockSocket = () => {
-  const listeners: Record<string, Function[]> = {};
-  
-  return {
-    emit: (event: string, data: any) => {
-      console.log(`Emitted ${event}`, data);
-      
-      // Simulate call accepted after delay
-      if (event === 'call-initiate') {
-        setTimeout(() => {
-          if (listeners['call-accepted']) {
-            listeners['call-accepted'].forEach(callback => 
-              callback({
-                callId: 'mock-call-id',
-                participants: data.participants
-              })
-            );
-          }
-        }, 1500);
-      }
-    },
-    on: (event: string, callback: Function) => {
-      if (!listeners[event]) {
-        listeners[event] = [];
-      }
-      listeners[event].push(callback);
-    },
-    off: (event: string) => {
-      delete listeners[event];
-    }
-  };
-};
+interface CallProviderProps {
+  children: React.ReactNode;
+  currentUser: User;
+}
 
-export const CallProvider: React.FC<{children: React.ReactNode, currentUser: User}> = ({ 
-  children, 
-  currentUser 
-}) => {
+const generateCallId = () => Math.random().toString(36).substring(2, 15);
+
+export function CallProvider({ children, currentUser }: CallProviderProps) {
+  // Call state
   const [callStatus, setCallStatus] = useState<CallStatus>('idle');
-  const [callType, setCallType] = useState<CallType | null>(null);
-  const [participants, setParticipants] = useState<CallParticipant[]>([]);
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [screenStream, setScreenStream] = useState<MediaStream | null>(null);
-  const [isAudioEnabled, setIsAudioEnabled] = useState(true);
+  const [currentCall, setCurrentCall] = useState<CallSession | null>(null);
+  const [incomingCall, setIncomingCall] = useState<{ caller: User; type: CallType } | null>(null);
+  
+  // Media state
+  const [isMuted, setIsMuted] = useState(false);
   const [isVideoEnabled, setIsVideoEnabled] = useState(true);
   const [isScreenSharing, setIsScreenSharing] = useState(false);
-  const [activeParticipant, setActiveParticipant] = useState<CallParticipant | null>(null);
   
-  // Mock socket for signaling
-  const socketRef = useRef(createMockSocket());
+  // Mock connections
+  const [mockConnections, setMockConnections] = useState<Record<string, boolean>>({});
   
+  // Timeouts refs
+  const callTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const mockIncomingCallTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  
+  // Cleanup on unmount
   useEffect(() => {
-    // Set up socket listeners
-    const socket = socketRef.current;
-    
-    socket.on('call-incoming', (data: any) => {
-      // Handle incoming call logic
-      console.log('Incoming call', data);
-    });
-    
-    socket.on('call-accepted', (data: any) => {
-      setCallStatus('connected');
-      console.log('Call accepted', data);
-    });
-    
-    socket.on('call-rejected', () => {
-      setCallStatus('ended');
-      console.log('Call rejected');
-    });
-    
-    socket.on('call-ended', () => {
-      endCall();
-      console.log('Call ended by other participant');
-    });
-    
-    // Clean up listeners
     return () => {
-      socket.off('call-incoming');
-      socket.off('call-accepted');
-      socket.off('call-rejected');
-      socket.off('call-ended');
+      if (callTimeoutRef.current) {
+        clearTimeout(callTimeoutRef.current);
+      }
+      if (mockIncomingCallTimeoutRef.current) {
+        clearTimeout(mockIncomingCallTimeoutRef.current);
+      }
     };
   }, []);
   
-  // Function to get user media
-  const getUserMedia = async (type: CallType) => {
-    try {
-      const constraints = {
-        audio: true,
-        video: type === 'video',
-      };
-      
-      const stream = await navigator.mediaDevices.getUserMedia(constraints);
-      setLocalStream(stream);
-      
-      // Set initial states based on stream
-      setIsAudioEnabled(true);
-      setIsVideoEnabled(type === 'video');
-      
-      return stream;
-    } catch (error) {
-      console.error('Error getting user media:', error);
-      return null;
+  // Mock incoming call for demo purposes
+  const setupMockIncomingCall = () => {
+    // Cancel any existing timeout
+    if (mockIncomingCallTimeoutRef.current) {
+      clearTimeout(mockIncomingCallTimeoutRef.current);
     }
-  };
-  
-  // Initiate a call with selected users
-  const initiateCall = async (users: User[], type: CallType) => {
-    try {
-      // Get local media stream
-      const stream = await getUserMedia(type);
-      
-      if (!stream) {
-        console.error('Failed to get media stream');
-        return;
+    
+    // Set a random timeout between 20-40 seconds for next mock incoming call
+    const timeout = Math.floor(Math.random() * 20000) + 20000;
+    mockIncomingCallTimeoutRef.current = setTimeout(() => {
+      // Only trigger if not in a call
+      if (callStatus === 'idle') {
+        const mockCaller: User = {
+          id: 500,
+          username: 'codesage',
+          tagNumber: '0042',
+          status: 'online',
+          avatarInitial: 'C',
+          avatarColor: '#4CAF50',
+          joinedAt: new Date()
+        };
+        
+        // 50% chance of video or audio call
+        const callType: CallType = Math.random() > 0.5 ? 'video' : 'audio';
+        
+        setIncomingCall({
+          caller: mockCaller,
+          type: callType
+        });
+        
+        // Auto reject after 15 seconds if not answered
+        setTimeout(() => {
+          if (incomingCall && callStatus === 'idle') {
+            setIncomingCall(null);
+          }
+        }, 15000);
       }
       
-      // Create list of participants including current user
-      const localParticipant: CallParticipant = {
-        user: currentUser,
-        stream,
-        audio: true,
-        video: type === 'video',
-        screen: false,
-      };
-      
-      const remoteParticipants: CallParticipant[] = users.map(user => ({
-        user,
-        audio: false,
-        video: false,
-        screen: false,
-      }));
-      
-      const allParticipants = [localParticipant, ...remoteParticipants];
-      setParticipants(allParticipants);
-      setActiveParticipant(localParticipant);
-      
-      // Set call status and type
-      setCallStatus('calling');
-      setCallType(type);
-      
-      // Emit call initiation event to signaling server
-      socketRef.current.emit('call-initiate', {
-        participants: users.map(user => user.id),
-        type,
-      });
-    } catch (error) {
-      console.error('Error initiating call:', error);
-    }
+      // Setup next mock call
+      setupMockIncomingCall();
+    }, timeout);
   };
   
-  // Join an existing call
-  const joinCall = async (callId: string) => {
-    try {
-      // Determine call type (would normally come from signaling)
-      const type: CallType = 'video'; // Assuming video for demo
-      
-      // Get local media stream
-      const stream = await getUserMedia(type);
-      
-      if (!stream) {
-        console.error('Failed to get media stream');
-        return;
-      }
-      
-      // Set call status and type
-      setCallStatus('connected');
-      setCallType(type);
-      
-      // Add current user to participants
-      const localParticipant: CallParticipant = {
-        user: currentUser,
-        stream,
-        audio: true,
-        video: type === 'video',
-        screen: false,
-      };
-      
-      setParticipants([localParticipant]);
-      setActiveParticipant(localParticipant);
-      
-      // Emit join call event
-      socketRef.current.emit('call-join', {
-        callId,
+  // Initiate call to recipients
+  const initiateCall = (recipients: User[], type: CallType) => {
+    if (callStatus !== 'idle') {
+      toast({
+        title: 'Call in progress',
+        description: 'Please end your current call before starting a new one',
+        variant: 'destructive'
       });
-    } catch (error) {
-      console.error('Error joining call:', error);
+      return;
     }
+    
+    const callId = generateCallId();
+    setCurrentCall({
+      id: callId,
+      type,
+      participants: recipients,
+      isScreenSharing: false
+    });
+    setCallStatus('calling');
+    
+    // Clear any previous timeouts
+    if (callTimeoutRef.current) {
+      clearTimeout(callTimeoutRef.current);
+    }
+    
+    // Setup mock call accept/reject
+    callTimeoutRef.current = setTimeout(() => {
+      // Simulate 80% chance of call being accepted
+      if (Math.random() < 0.8) {
+        // Call accepted
+        setCallStatus('connected');
+        toast({
+          title: 'Call connected',
+          description: `${recipients.map(r => r.username).join(', ')} joined the call`,
+        });
+        
+        // Setup mock connections
+        const connections: Record<string, boolean> = {};
+        recipients.forEach(recipient => {
+          connections[recipient.id.toString()] = true;
+        });
+        setMockConnections(connections);
+      } else {
+        // Call rejected
+        setCallStatus('ended');
+        setCurrentCall(null);
+        toast({
+          title: 'Call ended',
+          description: `${recipients.map(r => r.username).join(', ')} did not answer`,
+          variant: 'destructive'
+        });
+      }
+    }, 3000);
+  };
+  
+  // Accept incoming call
+  const acceptCall = () => {
+    if (!incomingCall) return;
+    
+    const callId = generateCallId();
+    setCurrentCall({
+      id: callId,
+      type: incomingCall.type,
+      participants: [incomingCall.caller],
+      isScreenSharing: false
+    });
+    
+    setCallStatus('connected');
+    setIncomingCall(null);
+    
+    // Setup mock connection
+    setMockConnections({
+      [incomingCall.caller.id.toString()]: true
+    });
+    
+    toast({
+      title: 'Call connected',
+      description: `You joined ${incomingCall.caller.username}'s ${incomingCall.type} call`,
+    });
+  };
+  
+  // Reject incoming call
+  const rejectCall = () => {
+    if (!incomingCall) return;
+    
+    setIncomingCall(null);
+    toast({
+      title: 'Call rejected',
+      description: `You declined ${incomingCall.caller.username}'s call`,
+    });
   };
   
   // End current call
   const endCall = () => {
-    // Stop all media streams
-    if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
-      setLocalStream(null);
-    }
-    
-    if (screenStream) {
-      screenStream.getTracks().forEach(track => track.stop());
-      setScreenStream(null);
-    }
-    
-    // Emit event to notify others
-    socketRef.current.emit('call-end');
-    
-    // Reset call state
-    setCallStatus('idle');
-    setCallType(null);
-    setParticipants([]);
-    setActiveParticipant(null);
-    setIsScreenSharing(false);
-  };
-  
-  // Toggle audio mute state
-  const toggleAudio = () => {
-    if (localStream) {
-      const audioTracks = localStream.getAudioTracks();
-      const newState = !isAudioEnabled;
+    if (callStatus !== 'idle') {
+      setCallStatus('ended');
       
-      audioTracks.forEach(track => {
-        track.enabled = newState;
-      });
+      // Small delay before resetting completely
+      setTimeout(() => {
+        setCallStatus('idle');
+        setCurrentCall(null);
+        setMockConnections({});
+      }, 500);
       
-      // Update participant info
-      setParticipants(prev => 
-        prev.map(p => 
-          p.user.id === currentUser.id 
-            ? { ...p, audio: newState } 
-            : p
-        )
-      );
-      
-      setIsAudioEnabled(newState);
-      
-      // Notify other participants of mute state
-      socketRef.current.emit('audio-toggle', {
-        enabled: newState,
+      toast({
+        title: 'Call ended',
+        description: 'The call has been ended',
       });
     }
   };
   
-  // Toggle video state
+  // Toggle mute
+  const toggleMute = () => {
+    setIsMuted(!isMuted);
+    toast({
+      title: isMuted ? 'Microphone unmuted' : 'Microphone muted',
+      description: isMuted ? 'Others can now hear you' : 'Others cannot hear you',
+    });
+  };
+  
+  // Toggle video
   const toggleVideo = () => {
-    if (localStream) {
-      const videoTracks = localStream.getVideoTracks();
-      const newState = !isVideoEnabled;
-      
-      videoTracks.forEach(track => {
-        track.enabled = newState;
+    setIsVideoEnabled(!isVideoEnabled);
+    toast({
+      title: isVideoEnabled ? 'Camera turned off' : 'Camera turned on',
+      description: isVideoEnabled ? 'Others cannot see you' : 'Others can now see you',
+    });
+  };
+  
+  // Toggle screen share
+  const toggleScreenShare = () => {
+    if (currentCall) {
+      setIsScreenSharing(!isScreenSharing);
+      setCurrentCall({
+        ...currentCall,
+        isScreenSharing: !isScreenSharing
       });
       
-      // Update participant info
-      setParticipants(prev => 
-        prev.map(p => 
-          p.user.id === currentUser.id 
-            ? { ...p, video: newState } 
-            : p
-        )
-      );
-      
-      setIsVideoEnabled(newState);
-      
-      // Notify other participants
-      socketRef.current.emit('video-toggle', {
-        enabled: newState,
+      toast({
+        title: isScreenSharing ? 'Screen sharing stopped' : 'Screen sharing started',
+        description: isScreenSharing 
+          ? 'You stopped sharing your screen' 
+          : 'Others can now see your screen',
       });
     }
   };
   
-  // Toggle screen sharing
-  const toggleScreenShare = async () => {
-    try {
-      // If already sharing screen, stop sharing
-      if (isScreenSharing && screenStream) {
-        screenStream.getTracks().forEach(track => track.stop());
-        setScreenStream(null);
-        setIsScreenSharing(false);
-        
-        // Update participant info
-        setParticipants(prev => 
-          prev.map(p => 
-            p.user.id === currentUser.id 
-              ? { ...p, screen: false } 
-              : p
-          )
-        );
-        
-        // Notify other participants
-        socketRef.current.emit('screen-share-end');
-        return;
+  // Initialize mock call system
+  useEffect(() => {
+    setupMockIncomingCall();
+    
+    return () => {
+      if (mockIncomingCallTimeoutRef.current) {
+        clearTimeout(mockIncomingCallTimeoutRef.current);
       }
-      
-      // Start screen sharing
-      const stream = await navigator.mediaDevices.getDisplayMedia({
-        video: true,
-        audio: false,
-      });
-      
-      setScreenStream(stream);
-      setIsScreenSharing(true);
-      
-      // Update participant info
-      setParticipants(prev => 
-        prev.map(p => 
-          p.user.id === currentUser.id 
-            ? { ...p, screen: true } 
-            : p
-        )
-      );
-      
-      // Notify other participants
-      socketRef.current.emit('screen-share-start');
-      
-      // Handle stream end (user stops sharing)
-      stream.getVideoTracks()[0].onended = () => {
-        setScreenStream(null);
-        setIsScreenSharing(false);
-        
-        // Update participant info
-        setParticipants(prev => 
-          prev.map(p => 
-            p.user.id === currentUser.id 
-              ? { ...p, screen: false } 
-              : p
-          )
-        );
-        
-        // Notify other participants
-        socketRef.current.emit('screen-share-end');
-      };
-    } catch (error) {
-      console.error('Error toggling screen share:', error);
-    }
+    };
+  }, []);
+  
+  const value = {
+    callStatus,
+    currentCall,
+    incomingCall,
+    initiateCall,
+    acceptCall,
+    rejectCall,
+    endCall,
+    toggleMute,
+    toggleVideo,
+    toggleScreenShare,
+    isMuted,
+    isVideoEnabled,
+    isScreenSharing
   };
   
   return (
-    <CallContext.Provider
-      value={{
-        callStatus,
-        callType,
-        participants,
-        localStream,
-        screenStream,
-        isAudioEnabled,
-        isVideoEnabled,
-        isScreenSharing,
-        activeParticipant,
-        initiateCall,
-        joinCall,
-        endCall,
-        toggleAudio,
-        toggleVideo,
-        toggleScreenShare,
-        setActiveParticipant,
-      }}
-    >
+    <CallContext.Provider value={value}>
       {children}
     </CallContext.Provider>
   );
-};
+}
 
-// Custom hook to use call context
-export const useCall = () => useContext(CallContext);
+export function useCall() {
+  const context = useContext(CallContext);
+  if (context === undefined) {
+    throw new Error('useCall must be used within a CallProvider');
+  }
+  return context;
+}
