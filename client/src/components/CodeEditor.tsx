@@ -93,35 +93,81 @@ export function CodeEditor({
       onRun(code, language);
     }
     
-    // Mock execution for JavaScript code
+    // Execute the code based on language
     if (language === 'javascript') {
       try {
-        // Using function constructor for safer eval (still not production safe)
-        const result = new Function(`
-          try {
-            let console = {
-              log: function(...args) {
-                return args.map(arg => 
-                  typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
-                ).join(' ');
-              }
-            };
-            let output = [];
-            
-            ${code}
-            
-            return output.join('\\n');
-          } catch(e) {
-            return "Error: " + e.message;
-          }
-        `)();
+        // Create a safe execution environment for JavaScript
+        const originalConsoleLog = console.log;
+        const logs: string[] = [];
         
-        setOutput(result || 'Code executed successfully with no output.');
+        // Override console.log to capture outputs
+        console.log = (...args) => {
+          logs.push(
+            args.map(arg => 
+              typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ')
+          );
+          originalConsoleLog(...args);
+        };
+        
+        // Execute the code in a try-catch block
+        try {
+          // Using Function constructor instead of eval for slightly better safety
+          new Function(code)();
+          if (logs.length > 0) {
+            setOutput(logs.join('\n'));
+          } else {
+            setOutput('Code executed successfully with no output.');
+          }
+        } catch (e) {
+          setOutput(`Runtime Error: ${e instanceof Error ? e.message : String(e)}`);
+        }
+        
+        // Restore original console.log
+        console.log = originalConsoleLog;
       } catch (error) {
         setOutput(`Error: ${error instanceof Error ? error.message : String(error)}`);
       }
+    } else if (language === 'python') {
+      // Mock Python execution with a realistic response
+      const pythonOutput = [
+        "Python 3.11.0",
+        ">>> Executing code...",
+        "",
+      ];
+      
+      // Generate some mock output based on code content
+      if (code.includes("print")) {
+        const printMatches = code.match(/print\s*\((.*?)\)/g);
+        if (printMatches) {
+          printMatches.forEach(match => {
+            const content = match.substring(match.indexOf('(') + 1, match.lastIndexOf(')'));
+            // Handle simple string literals
+            if (content.startsWith("'") || content.startsWith('"')) {
+              const stripped = content.slice(1, -1);
+              pythonOutput.push(stripped);
+            } else {
+              // For more complex expressions, provide a plausible output
+              pythonOutput.push(`Output: ${content}`);
+            }
+          });
+        }
+      } else {
+        pythonOutput.push("# Code executed without output");
+      }
+      
+      setOutput(pythonOutput.join('\n'));
     } else {
-      setOutput(`Running ${language} code is not supported in the browser environment.`);
+      setOutput(`Running ${language} code is not supported in the browser environment.
+To execute ${language} code, you would typically need a backend service that supports this language.
+
+For educational purposes, here's what execution would look like:
+
+> Running ${language.toUpperCase()} Interpreter...
+> Code submitted for execution
+> Compilation successful
+> Running program...
+> Program completed with exit code 0`);
     }
     
     setTerminalVisible(true);

@@ -81,6 +81,11 @@ export function Terminal({ className, defaultCommands = [] }: TerminalProps) {
     let output = '';
     let isError = false;
     
+    // Skip empty commands
+    if (!input.trim()) {
+      return;
+    }
+    
     const commandParts = input.trim().split(' ');
     const command = commandParts[0];
     const args = commandParts.slice(1);

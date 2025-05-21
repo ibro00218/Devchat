@@ -30,7 +30,13 @@ export function CodeBlock({ snippet, className, onLanguageChange, editable = fal
   useEffect(() => {
     if (codeRef.current && !isEditing) {
       try {
-        codeRef.current.innerHTML = highlightCode(snippet.code, snippet.language);
+        const highlighted = highlightCode(snippet.code, snippet.language);
+        if (highlighted) {
+          codeRef.current.innerHTML = highlighted;
+        } else {
+          // If highlighting fails, display plain text
+          codeRef.current.textContent = snippet.code;
+        }
       } catch (error) {
         console.error("Failed to highlight code:", error);
         // Fallback to plain text with escaping
@@ -272,7 +278,9 @@ export function CodeBlock({ snippet, className, onLanguageChange, editable = fal
           
           <div className="bg-[#1E1E1E] overflow-auto max-h-[70vh]">
             <pre className="p-4 m-0 bg-[#1E1E1E] overflow-x-auto scrollbar-custom text-sm leading-relaxed">
-              <code className={`language-${snippet.language}`} dangerouslySetInnerHTML={{ __html: highlightCode(snippet.code, snippet.language) }} />
+              <code className={`language-${snippet.language}`}>
+                {snippet.code}
+              </code>
             </pre>
           </div>
           
