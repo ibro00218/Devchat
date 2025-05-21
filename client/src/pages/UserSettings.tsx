@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -24,7 +24,7 @@ import {
 } from 'lucide-react';
 
 export default function UserSettings() {
-  const [, navigate] = useNavigate();
+  const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState('my-account');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
@@ -63,7 +63,7 @@ export default function UserSettings() {
     console.log('Saving user settings');
     // Show success message
     setTimeout(() => {
-      navigate('/');
+      setLocation('/');
     }, 1000);
   };
 
@@ -171,7 +171,7 @@ export default function UserSettings() {
           </TabsList>
         </div>
         
-        <Button variant="destructive" className="w-full mt-4" onClick={() => navigate('/')}>
+        <Button variant="destructive" className="w-full mt-4" onClick={() => setLocation('/')}>
           <LogOut className="h-4 w-4 mr-2" />
           Log Out
         </Button>
