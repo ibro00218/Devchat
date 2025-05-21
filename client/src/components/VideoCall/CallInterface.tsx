@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { User, CallSession } from '@/types/chat';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
-import { CallStatus, useCall } from './CallProvider';
+import { CallStatus, CallType, useCall } from './CallProvider';
 import { Mic, MicOff, Video, VideoOff, PhoneOff, MonitorUp, MonitorDown } from 'lucide-react';
 
 interface CallInterfaceProps {
   callSession: {
     id: string;
-    type: CallType;
+    type: 'audio' | 'video';
     isScreenSharing: boolean;
   };
   currentUser: User;

@@ -672,7 +672,11 @@ export function ChatWindow({
         <TabsContent value="call" className="flex-1 p-0 m-0 h-full overflow-hidden outline-none">
           {activeCall && (
             <CallInterface
-              callSession={activeCall}
+              callSession={{
+                id: activeCall.id,
+                type: activeCall.type as 'audio' | 'video',
+                isScreenSharing: activeCall.isScreenSharing
+              }}
               currentUser={loggedInUser}
               participants={users.filter(u => activeCall.participants.includes(u.id))}
               onEndCall={() => onEndCall && onEndCall()}
