@@ -36,13 +36,14 @@ export function CallInterface({
   const [callDuration, setCallDuration] = useState(0);
   const { callStatus } = useCall();
   
-  // Mock video/audio streams with colored divs for each participant
+  // Create visually distinct backgrounds for each participant's video
   const participantColors = [
-    'bg-blue-700',
-    'bg-emerald-700',
-    'bg-violet-700',
-    'bg-amber-700',
-    'bg-pink-700'
+    'bg-gradient-to-br from-blue-700 to-blue-900',
+    'bg-gradient-to-br from-emerald-700 to-emerald-900',
+    'bg-gradient-to-br from-violet-700 to-violet-900',
+    'bg-gradient-to-br from-amber-700 to-amber-900',
+    'bg-gradient-to-br from-pink-700 to-pink-900',
+    'bg-gradient-to-br from-cyan-700 to-cyan-900'
   ];
 
   // Update call duration timer
@@ -141,7 +142,19 @@ export function CallInterface({
               <span className="text-sm text-gray-300">{currentUser.username}</span>
             </div>
           ) : (
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-blue-600"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-800 to-blue-600 flex items-center justify-center">
+              <div className="relative w-full h-full overflow-hidden">
+                {/* Simulated video feed with animated gradient */}
+                <div className="absolute inset-0 opacity-20">
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-blue-600 to-blue-800 animate-pulse"></div>
+                </div>
+                
+                {/* Camera icon overlay */}
+                <div className="absolute bottom-10 right-10 text-white/30">
+                  <Video className="h-16 w-16" />
+                </div>
+              </div>
+            </div>
           )}
           
           {/* User label */}

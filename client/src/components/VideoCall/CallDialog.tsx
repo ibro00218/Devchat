@@ -24,8 +24,9 @@ interface IncomingCallProps {
 
 function IncomingCall({ caller, callType, onAccept, onReject }: IncomingCallProps) {
   return (
-    <div className="flex flex-col items-center gap-4 py-4">
+    <div className="flex flex-col items-center gap-6 py-6">
       <div className="relative">
+        <div className="absolute -inset-3 bg-blue-500/30 rounded-full animate-ping"></div>
         <UserAvatar user={caller} size="lg" />
         <div className="absolute bottom-0 right-0 bg-green-500 border-2 border-[#1A1A1A] rounded-full p-1">
           {callType === 'video' ? (
@@ -36,30 +37,34 @@ function IncomingCall({ caller, callType, onAccept, onReject }: IncomingCallProp
         </div>
       </div>
       
-      <div className="text-center">
-        <h3 className="text-lg font-medium text-white">Incoming {callType} call</h3>
-        <p className="text-sm text-gray-400">from {caller.username}</p>
+      <div className="text-center mt-2">
+        <h3 className="text-xl font-medium text-white">Incoming {callType} call</h3>
+        <p className="text-sm text-blue-400 mt-1">from <span className="font-semibold">{caller.username}</span></p>
       </div>
       
-      <div className="flex gap-4 mt-2">
-        <Button 
-          onClick={onReject} 
-          variant="destructive"
-          size="sm"
-          className="rounded-full"
-        >
-          <PhoneOff className="h-4 w-4 mr-2" />
-          Decline
-        </Button>
+      <div className="flex gap-6 mt-4 w-full justify-center">
+        <div className="flex flex-col items-center">
+          <Button 
+            onClick={onReject} 
+            variant="destructive"
+            size="lg"
+            className="rounded-full w-14 h-14 bg-red-600 hover:bg-red-700 border-0 shadow-lg shadow-red-600/30"
+          >
+            <PhoneOff className="h-6 w-6" />
+          </Button>
+          <span className="text-xs text-gray-400 mt-2">Decline</span>
+        </div>
         
-        <Button 
-          onClick={onAccept} 
-          className="bg-green-600 hover:bg-green-700 text-white rounded-full"
-          size="sm"
-        >
-          <Phone className="h-4 w-4 mr-2" />
-          Accept
-        </Button>
+        <div className="flex flex-col items-center">
+          <Button 
+            onClick={onAccept} 
+            className="rounded-full w-14 h-14 bg-green-600 hover:bg-green-700 text-white border-0 shadow-lg shadow-green-600/30"
+            size="lg"
+          >
+            <Phone className="h-6 w-6" />
+          </Button>
+          <span className="text-xs text-gray-400 mt-2">Accept</span>
+        </div>
       </div>
     </div>
   );
@@ -128,12 +133,14 @@ export const CallDialog: React.FC<CallDialogProps> = ({
     // Show incoming call UI
     if (incomingCall && !callInitiated) {
       return (
-        <IncomingCall 
-          caller={incomingCall.caller} 
-          callType={incomingCall.type} 
-          onAccept={handleAcceptCall} 
-          onReject={handleRejectCall} 
-        />
+        <div className="animate-pulse">
+          <IncomingCall 
+            caller={incomingCall.caller} 
+            callType={incomingCall.type} 
+            onAccept={handleAcceptCall} 
+            onReject={handleRejectCall} 
+          />
+        </div>
       );
     }
     
@@ -172,29 +179,39 @@ export const CallDialog: React.FC<CallDialogProps> = ({
         <div className="flex flex-col items-center gap-6 py-6">
           <UserAvatar user={recipient} size="lg" />
           
-          <div className="text-center">
-            <h3 className="text-lg font-medium text-white">{recipient.username}</h3>
-            <p className="text-sm text-gray-400">Start a call</p>
+          <div className="text-center space-y-2">
+            <h3 className="text-xl font-medium text-white">{recipient.username}</h3>
+            <div className="inline-flex items-center px-2 py-1 bg-green-500/10 border border-green-500/20 rounded-full">
+              <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
+              <p className="text-xs text-green-400">Online</p>
+            </div>
+            <p className="text-sm text-gray-400 mt-4">Choose how to connect</p>
           </div>
           
           <div className="flex gap-6 mt-2">
-            <Button 
-              onClick={() => handleInitiateCall('audio')}
-              variant="outline"
-              size="lg"
-              className="rounded-full w-14 h-14 flex items-center justify-center bg-[#3A3A3A] hover:bg-[#484848]"
-            >
-              <Mic className="h-6 w-6" />
-            </Button>
+            <div className="flex flex-col items-center">
+              <Button 
+                onClick={() => handleInitiateCall('audio')}
+                variant="outline"
+                size="lg"
+                className="rounded-full w-16 h-16 flex items-center justify-center bg-indigo-600 hover:bg-indigo-700 border-0 shadow-lg shadow-indigo-700/30 transition-all duration-300"
+              >
+                <Mic className="h-7 w-7" />
+              </Button>
+              <span className="text-xs text-gray-400 mt-2">Voice</span>
+            </div>
             
-            <Button 
-              onClick={() => handleInitiateCall('video')}
-              variant="outline"
-              size="lg"
-              className="rounded-full w-14 h-14 flex items-center justify-center bg-[#3A3A3A] hover:bg-[#484848]"
-            >
-              <Video className="h-6 w-6" />
-            </Button>
+            <div className="flex flex-col items-center">
+              <Button 
+                onClick={() => handleInitiateCall('video')}
+                variant="outline"
+                size="lg"
+                className="rounded-full w-16 h-16 flex items-center justify-center bg-emerald-600 hover:bg-emerald-700 border-0 shadow-lg shadow-emerald-700/30 transition-all duration-300"
+              >
+                <Video className="h-7 w-7" />
+              </Button>
+              <span className="text-xs text-gray-400 mt-2">Video</span>
+            </div>
           </div>
         </div>
       );
