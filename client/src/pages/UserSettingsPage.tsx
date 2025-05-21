@@ -27,6 +27,8 @@ export default function UserSettingsPage() {
   const [activeSection, setActiveSection] = useState('my-account');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+  const [currentTheme, setCurrentTheme] = useState('dark');
+  const [fontSize, setFontSize] = useState(14);
   
   // Mock user data
   const user = {
@@ -104,7 +106,18 @@ export default function UserSettingsPage() {
                         <p className="text-xs text-zinc-400 mb-1">USERNAME</p>
                         <p className="text-base font-medium">{user.username}</p>
                       </div>
-                      <Button variant="outline" className="h-8 bg-[#4752c4] hover:bg-[#5865f2] border-none">
+                      <Button 
+                        variant="outline" 
+                        className="h-8 bg-[#4752c4] hover:bg-[#5865f2] border-none"
+                        onClick={() => {
+                          // Create an editable username field
+                          const username = prompt("Enter new username:", user.username);
+                          if (username && username.trim()) {
+                            console.log(`Username updated to: ${username}`);
+                            // In a real app, would update user state & call API
+                          }
+                        }}
+                      >
                         Edit
                       </Button>
                     </div>
@@ -248,17 +261,45 @@ export default function UserSettingsPage() {
               <h2 className="font-medium mb-3">Theme</h2>
               
               <div className="grid grid-cols-3 gap-3 mb-4">
-                <div className="bg-[#1e1f22] p-3 rounded border-2 border-[#5865f2] cursor-pointer">
+                <div 
+                  className={`bg-[#1e1f22] p-3 rounded cursor-pointer ${currentTheme === 'dark' ? 'border-2 border-[#5865f2]' : 'border border-[#3b3d43]'}`}
+                  onClick={() => {
+                    setCurrentTheme('dark');
+                    // In a real app, would apply dark theme to the application
+                    document.documentElement.classList.add('dark');
+                    document.documentElement.classList.remove('light');
+                    console.log('Dark theme applied');
+                  }}
+                >
                   <p className="font-medium">Dark</p>
                   <p className="text-xs text-zinc-400">Default dark theme</p>
                 </div>
                 
-                <div className="bg-[#ffffff] p-3 rounded border border-[#3b3d43] text-black cursor-pointer">
+                <div 
+                  className={`bg-[#ffffff] p-3 rounded text-black cursor-pointer ${currentTheme === 'light' ? 'border-2 border-[#5865f2]' : 'border border-[#3b3d43]'}`}
+                  onClick={() => {
+                    setCurrentTheme('light');
+                    // In a real app, would apply light theme to the application
+                    document.documentElement.classList.add('light');
+                    document.documentElement.classList.remove('dark');
+                    console.log('Light theme applied');
+                  }}
+                >
                   <p className="font-medium">Light</p>
                   <p className="text-xs text-zinc-600">Light theme</p>
                 </div>
                 
-                <div className="bg-[#313338] p-3 rounded border border-[#3b3d43] cursor-pointer">
+                <div 
+                  className={`bg-[#313338] p-3 rounded cursor-pointer ${currentTheme === 'dim' ? 'border-2 border-[#5865f2]' : 'border border-[#3b3d43]'}`}
+                  onClick={() => {
+                    setCurrentTheme('dim');
+                    // In a real app, would apply dim theme to the application
+                    document.documentElement.classList.add('dim');
+                    document.documentElement.classList.remove('light');
+                    document.documentElement.classList.remove('dark');
+                    console.log('Dim theme applied');
+                  }}
+                >
                   <p className="font-medium">Dim</p>
                   <p className="text-xs text-zinc-400">Softer dark theme</p>
                 </div>
@@ -272,10 +313,17 @@ export default function UserSettingsPage() {
                     type="range" 
                     min="12" 
                     max="20" 
-                    defaultValue="14" 
+                    value={fontSize}
+                    onChange={(e) => {
+                      const newSize = parseInt(e.target.value);
+                      setFontSize(newSize);
+                      // Apply font size to the document
+                      document.documentElement.style.fontSize = `${newSize}px`;
+                      console.log(`Font size changed to ${newSize}px`);
+                    }}
                     className="flex-1"
                   />
-                  <span className="text-sm">Large</span>
+                  <span className="text-sm">Large ({fontSize}px)</span>
                 </div>
               </div>
             </div>
