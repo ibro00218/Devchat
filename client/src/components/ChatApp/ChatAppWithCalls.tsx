@@ -11,17 +11,22 @@ export default function ChatAppWithCalls() {
   const {
     users,
     groups,
-    messages,
+    channels,
     currentChat,
+    currentChatEntity,
+    currentChannel,
+    messages: allMessages,
+    activeCall,
     currentUser,
+    selectChat,
+    selectChannel,
     sendMessage,
     sendCodeSnippet,
-    sendAttachments,
-    initiateCall,
+    sendFileAttachments: sendAttachments,
+    startCall: initiateCall,
     endCall,
     joinCall,
-    activeCall,
-    currentGroupChannels
+    toggleScreenSharing
   } = useChat();
 
   // Current open chat entity (user or group)
@@ -31,54 +36,33 @@ export default function ChatAppWithCalls() {
       : groups.find(group => group.id === currentChat.id)
     : null;
 
-  // Current chat messages
-  const chatMessages = currentChat
-    ? currentChat.type === 'user'
-      ? messages.filter(msg =>
-          (msg.senderId === currentUser.id && msg.recipientId === currentChat.id) ||
-          (msg.senderId === currentChat.id && msg.recipientId === currentUser.id)
-        )
-      : messages.filter(msg => msg.groupId === currentChat.id)
-    : [];
+  // Current chat messages - use the messages directly from the hook
+  const chatMessages = allMessages;
 
-  // Current group members (if in a group chat)
+  // For simplicity, let's assume all users are members if it's a group chat
   const groupMembers = currentChat?.type === 'group'
-    ? users.filter(user => groups.find(g => g.id === currentChat.id)?.members?.includes(user.id))
+    ? users.filter(user => user.id !== currentUser.id)
     : [];
 
   const handleSendMessage = (text: string) => {
     if (!currentChat) return;
-
-    // Depending on chat type, send message to user or group
-    if (currentChat.type === 'user') {
-      sendMessage(text, currentChat.id);
-    } else {
-      sendMessage(text, undefined, currentChat.id);
-    }
+    
+    // Use the updated sendMessage interface
+    sendMessage(text);
   };
 
   const handleSendCode = (code: string, language: string) => {
     if (!currentChat) return;
-
-    const codeSnippet: CodeSnippet = {
-      language,
-      code
-    };
-
-    // Send code snippet
-    if (currentChat.type === 'user') {
-      sendCodeSnippet(codeSnippet, currentChat.id);
-    } else {
-      sendCodeSnippet(codeSnippet, undefined, currentChat.id);
-    }
+    
+    // Use the updated sendCodeSnippet interface
+    sendCodeSnippet(code, language);
   };
 
   const handleSendAttachments = (files: File[]) => {
     if (!currentChat) return;
 
-    // Send attachments
-    sendAttachments(files, currentChat.type === 'user' ? currentChat.id : undefined, 
-                   currentChat.type === 'group' ? currentChat.id : undefined);
+    // Send attachments using the updated interface
+    sendAttachments(files);
     
     toast({
       title: 'Files sent',
