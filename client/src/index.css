@@ -3,6 +3,63 @@
 @tailwind utilities;
 
 :root {
+  /* Default theme (dark) */
+  --bg-primary: #1E1E1E;
+  --bg-secondary: #2b2d31;
+  --bg-tertiary: #313338;
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A0A0;
+  --accent-color: #5865F2;
+  --border-color: #3b3d43;
+}
+
+/* Theme classes */
+body.theme-dark {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body.theme-light {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+body.theme-dim {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Apply styles through theme variables */
+.bg-primary {
+  background-color: var(--bg-primary);
+}
+
+.bg-secondary {
+  background-color: var(--bg-secondary);
+}
+
+.bg-tertiary {
+  background-color: var(--bg-tertiary);
+}
+
+.text-primary {
+  color: var(--text-primary);
+}
+
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.border-themed {
+  border-color: var(--border-color);
+}
+
+/* Font size control */
+html {
+  font-size: 14px; /* Default size */
+}
+
+:root {
   --background: 240 10% 3.9%;
   --foreground: 0 0% 98%;
   --muted: 240 3.7% 15.9%;
