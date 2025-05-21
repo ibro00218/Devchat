@@ -6,13 +6,28 @@ export default function ChatApp() {
   const { 
     users, 
     groups, 
+    channels,
     currentChat, 
     currentChatEntity,
+    currentChannel,
     messages, 
+    groupMembers, 
+    activeCall,
+    currentUser,
     selectChat, 
+    selectChannel,
     sendMessage, 
     sendCodeSnippet,
-    createNewParty
+    sendFileAttachments,
+    startCall,
+    endCall,
+    joinCall,
+    toggleScreenSharing,
+    createNewParty,
+    addMessageReaction,
+    editMessage,
+    deleteMessage,
+    updateGroup
   } = useChat();
 
   return (
@@ -30,8 +45,25 @@ export default function ChatApp() {
         isGroup={currentChat?.type === "group"}
         messages={messages}
         users={users}
+        channels={channels}
+        currentChannel={currentChannel}
+        groupMembers={groupMembers}
+        activeCall={activeCall}
+        loggedInUser={currentUser}
         onSendMessage={sendMessage}
         onSendCode={sendCodeSnippet}
+        onSendAttachments={sendFileAttachments}
+        onStartCall={startCall}
+        onEndCall={endCall}
+        onJoinCall={joinCall}
+        onShareScreen={toggleScreenSharing}
+        onToggleMute={() => console.log("Toggle mute")}
+        onToggleVideo={() => console.log("Toggle video")}
+        onUpdateGroup={updateGroup}
+        onSelectChannel={selectChannel}
+        onMessageReaction={addMessageReaction}
+        onEditMessage={editMessage}
+        onDeleteMessage={deleteMessage}
       />
     </div>
   );
