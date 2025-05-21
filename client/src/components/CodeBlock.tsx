@@ -2,14 +2,12 @@ import { useRef, useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { CodeSnippet } from "@/types/chat";
 import { useCopyToClipboard } from "@/hooks/useCopyToClipboard";
-import { highlightCode } from "@/lib/prism";
+import { highlightCode } from "@/lib/highlighter";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { LANGUAGE_OPTIONS } from "@/types/chat";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-// Removing this function as we now use highlightCode from prism.ts
 
 interface CodeBlockProps {
   snippet: CodeSnippet;

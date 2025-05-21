@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { LANGUAGE_OPTIONS } from '@/types/chat';
 import { Terminal } from './Terminal';
 import { cn } from '@/lib/utils';
-import { highlightCode } from '@/lib/prism';
+import { highlightCode } from '@/lib/highlighter';
 
 interface CodeEditorProps {
   initialCode?: string;
