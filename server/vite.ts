@@ -1,11 +1,8 @@
-import express, { type Express } from "express";
+import type { Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
-
-let viteLogger = createLogger();
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -19,10 +16,15 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  if (process.env.NODE_ENV === "production") return;
+
+  const { createServer: createViteServer, createLogger } = await import("vite");
+  const viteLogger = createLogger();
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
-    allowedHosts: ['.'], // Updated to be valid
+    allowedHosts: ['.'],
   };
 
   const vite = await createViteServer({
@@ -45,8 +47,7 @@ export async function setupVite(app: Express, server: Server) {
 
     try {
       const clientTemplate = path.resolve(
-        import.meta.dirname,
-        "..",
+        process.cwd(), // updated for compatibility
         "client",
         "index.html"
       );
@@ -64,6 +65,3 @@ export async function setupVite(app: Express, server: Server) {
     }
   });
 }
-
-// ✅ REMOVED: serveStatic(app)
-// You don't need to serve static files if frontend is on Firebase
