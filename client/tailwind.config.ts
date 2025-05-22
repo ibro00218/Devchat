@@ -1,19 +1,10 @@
 import type { Config } from "tailwindcss";
+import pluginAnimate from "tailwindcss-animate";
+import pluginTypography from "@tailwindcss/typography";
 
 const config: Config = {
   darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"], // These are inside client, so relative to client root
-  theme: {
-    extend: { /* ... */ },
-  },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
-};
-
-export default config;
-
-export default {
-  darkMode: ["class"],
-  content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"], // All paths are relative to `client/`
   theme: {
     extend: {
       borderRadius: {
@@ -75,20 +66,12 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
       },
       animation: {
@@ -97,5 +80,7 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
-} satisfies Config;
+  plugins: [pluginAnimate, pluginTypography],
+};
+
+export default config;
