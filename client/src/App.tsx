@@ -27,6 +27,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
+        <div className="bg-red-500 text-white p-4">Tailwind is working!</div>
         <Router />
       </TooltipProvider>
     </QueryClientProvider>
