@@ -1,6 +1,9 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
+import tailwindConfig from './tailwind.config.ts'; // Explicit import
+
+// OR you can configure the PostCSS plugin loader if needed
 
 export default defineConfig({
   plugins: [react()],
