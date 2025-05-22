@@ -70,15 +70,15 @@ app.use((req, res, next) => {
     await setupVite(app, server);
   } else {
     // 🚀 Production: Serve built frontend (from client/dist)
-    const staticPath = path.resolve(__dirname, "../client/dist");
-    if (!fs.existsSync(staticPath)) {
-      throw new Error(`Missing frontend build at ${staticPath}`);
-    }
+    //const staticPath = path.resolve(__dirname, "../client/dist");
+    //if (!fs.existsSync(staticPath)) {
+      //throw new Error(`Missing frontend build at ${staticPath}`);
+    //}
 
-    app.use(express.static(staticPath));
-    app.use("*", (_req, res) => {
-      res.sendFile(path.join(staticPath, "index.html"));
-    });
+    //app.use(express.static(staticPath));
+    //app.use("*", (_req, res) => {
+      //res.sendFile(path.join(staticPath, "index.html"));
+    //});
   }
 
   // 🌐 Always serve on port 5000 for Render compatibility
