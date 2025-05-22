@@ -82,7 +82,7 @@ app.use((req, res, next) => {
   }
 
   // 🌐 Always serve on port 5000 for Render compatibility
-  const port = 5000;
+  const port = process.env.PORT || 5000;
   server.listen(
     {
       port,
