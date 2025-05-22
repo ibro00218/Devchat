@@ -3,8 +3,14 @@ import { registerRoutes } from "./routes";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import * as fs from "fs";
+import { fileURLToPath } from "url";
 import path from "path";
 import { setupVite, log } from "./vite"; // ✅ Re-add these
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 // 🔐 Initialize Firebase Admin with secret from Render secret file
 const serviceAccount = JSON.parse(
