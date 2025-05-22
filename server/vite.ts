@@ -1,11 +1,18 @@
 import express, { type Express } from "express";
 import fs from "fs";
 import path from "path";
-import { createServer as createViteServer, createLogger } from "vite";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 
-const viteLogger = createLogger();
+let createViteServer: any;
+let viteLogger: any;
+
+if (process.env.NODE_ENV !== "production") {
+  // Only import vite in development
+  const vite = await import("vite");
+  createViteServer = vite.createServer;
+  viteLogger = vite.createLogger();
+}
 
 export function log(message: string, source = "express") {
   const formattedTime = new Date().toLocaleTimeString("en-US", {
@@ -19,16 +26,22 @@ export function log(message: string, source = "express") {
 }
 
 export async function setupVite(app: Express, server: Server) {
+  if (process.env.NODE_ENV === "production") {
+    console.warn("setupVite skipped in production.");
+    return;
+  }
+
   const serverOptions = {
     middlewareMode: true,
     hmr: { server },
+    allowedHosts: true as const, // 🛠️ Fix TS error by using valid type
   };
 
   const vite = await createViteServer({
     configFile: false,
     customLogger: {
       ...viteLogger,
-      error: (msg, options) => {
+      error: (msg: string, options?: any) => {
         viteLogger.error(msg, options);
         process.exit(1);
       },
