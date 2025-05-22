@@ -1,9 +1,10 @@
 import express, { Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
-import { setupVite, serveStatic, log } from "./vite";
 import { initializeApp, cert } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import * as fs from "fs";
+import path from "path";
+import { setupVite, log } from "./vite"; // ✅ Re-add these
 
 // 🔐 Initialize Firebase Admin with secret from Render secret file
 const serviceAccount = JSON.parse(
@@ -62,8 +63,16 @@ app.use((req, res, next) => {
   if (app.get("env") === "development") {
     await setupVite(app, server);
   } else {
-    // 🚀 Production: Serve built static files
-    serveStatic(app);
+    // 🚀 Production: Serve built frontend (from client/dist)
+    const staticPath = path.resolve(__dirname, "../client/dist");
+    if (!fs.existsSync(staticPath)) {
+      throw new Error(`Missing frontend build at ${staticPath}`);
+    }
+
+    app.use(express.static(staticPath));
+    app.use("*", (_req, res) => {
+      res.sendFile(path.join(staticPath, "index.html"));
+    });
   }
 
   // 🌐 Always serve on port 5000 for Render compatibility
