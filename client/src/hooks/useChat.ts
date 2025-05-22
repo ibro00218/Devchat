@@ -239,8 +239,8 @@ export function useChat() {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket("wss://<https://devchat-server.onrender.com>/ws");
+    const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const ws = new WebSocket(`${protocol}://devchat-server.onrender.com/ws`);
     
     ws.onopen = () => {
       setIsConnected(true);
