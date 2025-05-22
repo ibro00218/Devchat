@@ -1,5 +1,16 @@
 import type { Config } from "tailwindcss";
 
+const config: Config = {
+  darkMode: ["class"],
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"], // These are inside client, so relative to client root
+  theme: {
+    extend: { /* ... */ },
+  },
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
+};
+
+export default config;
+
 export default {
   darkMode: ["class"],
   content: ["./client/index.html", "./client/src/**/*.{js,jsx,ts,tsx}"],
