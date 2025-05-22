@@ -240,7 +240,7 @@ export function useChat() {
   // Initialize WebSocket connection
   useEffect(() => {
     const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+    const ws = new WebSocket("wss://<https://devchat-server.onrender.com>/ws");
     
     ws.onopen = () => {
       setIsConnected(true);
@@ -803,7 +803,7 @@ export function useChat() {
   const getCurrentGroupMembers = useCallback(() => {
     if (chatState.currentChat?.type !== 'group') return [];
     
-    return groupMembersMap.filter(m => m.groupId === chatState.currentChat.id);
+    return groupMembersMap.filter(m => m.groupId === chatState.currentChat?.id);
   }, [chatState.currentChat, groupMembersMap]);
 
   return {
