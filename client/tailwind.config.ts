@@ -1,15 +1,15 @@
-import defaultTheme from "tailwindcss/defaultTheme";
 import type { Config } from "tailwindcss";
 import pluginAnimate from "tailwindcss-animate";
 import pluginTypography from "@tailwindcss/typography";
 
 const config: Config = {
   darkMode: "class",
-  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"], // All paths are relative to `client/`
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       fontFamily: {
-        sans: ["Inter", ...defaultTheme.fontFamily.sans],
+        // Fix: Include default fallbacks and make sure the CSS variable is optional
+        sans: ["var(--font-sans)", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
