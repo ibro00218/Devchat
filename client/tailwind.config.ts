@@ -1,3 +1,4 @@
+import defaultTheme from "tailwindcss/defaultTheme";
 import type { Config } from "tailwindcss";
 import pluginAnimate from "tailwindcss-animate";
 import pluginTypography from "@tailwindcss/typography";
@@ -8,7 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["'Inter'", "sans-serif"],
+        sans: ["Inter", ...defaultTheme.fontFamily.sans],
       },
       borderRadius: {
         lg: "var(--radius)",
