@@ -5,6 +5,7 @@
 
 :root {
   /* Default theme (dark) */
+  --font-sans: 'Inter', sans-serif;
   --bg-primary: #1E1E1E;
   --bg-secondary: #2b2d31;
   --bg-tertiary: #313338;
