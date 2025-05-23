@@ -10,7 +10,7 @@
   --text-primary: #FFFFFF;
   --text-secondary: #A0A0A0;
   --accent-color: #5865F2;
-  --border-color: #3b3d43;
+  --border: 225, 6%, 25%;
 }
 
 /* Theme classes */
