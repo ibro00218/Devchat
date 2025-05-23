@@ -10,7 +10,7 @@ import UserSettingsPage from "@/pages/UserSettingsPage";
 
 function Router() {
   const isAuthenticated = true;
-
+  console.log("Rendering route. Auth:", isAuthenticated);
   return (
     <Switch>
       <Route path="/login" component={LoginPage} />
