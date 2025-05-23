@@ -116,7 +116,7 @@ html {
 
 @layer base {
   * {
-    @apply border-border;
+    @apply border border-[hsl(var(--border))];
   }
 
   body {
