@@ -9,9 +9,8 @@ import LoginPage from "@/pages/Login";
 import UserSettingsPage from "@/pages/UserSettingsPage";
 
 function Router() {
-  // For demo purposes, let's assume the user is authenticated
   const isAuthenticated = true;
-  
+
   return (
     <Switch>
       <Route path="/login" component={LoginPage} />
@@ -27,9 +26,9 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
-           <div className="bg-red-500 text-white p-4 text-xl">
-              Tailwind is working!
-            </div>
+        <div className="bg-red-500 text-white p-4 text-xl">
+          Tailwind is working!
+        </div>
         <Router />
       </TooltipProvider>
     </QueryClientProvider>
